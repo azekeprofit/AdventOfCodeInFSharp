@@ -1,0 +1,1 @@
+﻿Day2Year2025.Puzzle()
