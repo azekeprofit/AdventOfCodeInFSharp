@@ -41,5 +41,4 @@ let part2 data =
     result.zeroes                    
     
 
-let Puzzle() =  
-    printf $"{part2 Day1Year2025Inputs.data}"
+let Puzzle() =part2 Day1Year2025Inputs.data

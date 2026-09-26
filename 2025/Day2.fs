@@ -42,5 +42,4 @@ let part2 data=seq {
                 yield! repeatedChunk
                 } |> Seq.sum
 
-let Puzzle()=
-    printf $"{part2 Day2Year2025Inputs.data}"
+let Puzzle()=part2 Day2Year2025Inputs.data
