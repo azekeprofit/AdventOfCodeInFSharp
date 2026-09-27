@@ -16,28 +16,24 @@ let part1 bank=seq {
                   } |>Seq.max
 
                   
-let countOnes (n: bigint) =
-    n.ToByteArray()
-    |> Array.sumBy (fun b -> BitOperations.PopCount(uint32 b))
+let rec iteration (batteries:bigint) (bank:byte[]) start endd remainder=seq{
+    if remainder<=0 then 
+        yield batteries
+    else
+        for i in start..endd do
+            let newDigit=bank[i]
+            if (i=start) || (newDigit>bank[i-1]) then
+                yield! iteration ((batteries*10I)+bigint newDigit) bank (i+1) (endd+1) (remainder-1)
+}
+    
 
 let part2 bank=seq {
         let size=12
-        let len=String.length bank
-        let limit=bigint.Pow(2, len)
-        for n in bigint.Pow(2, size)-1I..limit do 
-            if size=countOnes n then
-                let s=seq {
-                    let mutable flags=n
-                    let mutable i=0
-                    while i<len && flags>0I do
-                        if flags%2I=1I then
-                            yield bank[i]
-                        flags<-flags>>>1 
-                        i<-i+1 }
-                yield s|>Seq.toArray|>System.String
+        let bankArray=bank|>String.getBytes(System.Text.Encoding.ASCII)|>Array.map(function b->b-48uy)
+        yield! iteration 0 bankArray 0 (bank.Length-size) size
                 }|>Seq.max
 
 let Puzzle()=
     let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2
-    let list=allCombinations |> Seq.map parse<bigint> |>Seq.toArray
-    list |>Seq.sum
+    // let list=allCombinations |>Seq.toArray
+    allCombinations |>Seq.sum
