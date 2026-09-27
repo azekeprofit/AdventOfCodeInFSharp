@@ -17,13 +17,14 @@ let part1 bank=seq {
 
                   
 let rec iteration (batteries:bigint) (bank:byte[]) start endd remainder=seq{
-    if remainder<=0 then 
-        yield batteries
-    else
-        for i in start..endd do
-            let newDigit=bank[i]
-            if (i=start) || (newDigit>bank[i-1]) then
-                yield! iteration ((batteries*10I)+bigint newDigit) bank (i+1) (endd+1) (remainder-1)
+    match remainder with
+        | 0 -> yield batteries/10I // this never runs, because last stage of recursion gets captured by 1 case below
+        | 1 -> yield batteries+bigint(Seq.max bank[start..endd]) // last digit is always maximum of remaining batteries
+        | _ -> for i in start..endd do
+                let newDigit=bank[i]
+                if start=i || newDigit>Seq.max(bank[start..i-1]) then
+                    yield! iteration ((batteries+bigint newDigit)*10I) bank (i+1) (endd+1) (remainder-1)
+                    // 10 multiplication is done ahead of time --^
 }
     
 
