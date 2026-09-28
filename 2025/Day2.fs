@@ -5,16 +5,10 @@ type range=Range of bigint * bigint
 
 let ranges data=seq {
     for line in String.split [| "," |] data do 
-        let ranges=String.split [|"-"|] line |> Seq.take 2 |>Seq.toList 
-
-
-        let sng= match ranges with 
-                        | [ s; e; ]-> (tryParse s, tryParse e)
-                        | _ -> (None, None)
-        match sng with 
-            |(Some s,Some e) -> yield Range(s, e)
-            | _  -> ()
-        }
+        let ranges=String.split [|"-"|] line |> Seq.take 2 |> Seq.toArray
+        match tryParseArray ranges with 
+            | Some (s,e) -> yield Range(s, e)
+            | _-> failwith "Incorrect range format" }
 
 let part1 data=seq { 
         for Range(s,e) in ranges data do

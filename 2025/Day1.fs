@@ -6,7 +6,7 @@ open FSharpPlus
 type Command= Left of int | Right of int
 
 let lines data= seq {
-    for line in String.split [| "\n"; "\r" |] data do     
+    for line in Common.splitLines data do     
                 let letter=line|>String.take 1
                 let number=line|>String.skip 1 |> tryParse<int>
                 match letter, number with
@@ -26,15 +26,14 @@ type accumulator= { wheel: int; zeroes: int }
 
 let turns n=abs n/100
 
-let turn {zeroes=z ; wheel=w} n=
+let turn {zeroes=z ; wheel=w} n =
     let sum=w+n 
     { wheel=sum%100 |> function s when s<0 -> 100+s; | s -> s
       zeroes= match sum with 
                 | 0 -> z+1
                 | over100 when over100>=100 -> z + turns over100
                 | negative when negative<0 ->  z + (if w=0 then 0 else 1) + turns negative
-                | s -> z + turns s
-     }
+                | s -> z + turns s }
     
 let part2 data =
     let result=fold turn {wheel=50; zeroes=0} (data|>lines|>Seq.map(function Left n -> -n ; | Right n -> n))

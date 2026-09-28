@@ -4,8 +4,7 @@ open System.Text.RegularExpressions
 open System.Numerics
 
 let banks data=
-        String.split [| "\n"; "\r" |] data 
-        |>Seq.filter(fun s -> String.length s>0)
+        Common.splitLines data
         |>Seq.map(function 
                     s when not(Regex.IsMatch(s,@"^\d+$")) -> failwith "Incorrect battery joltage data!"
                     |s->s)

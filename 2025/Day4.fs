@@ -5,8 +5,7 @@ open System.Text.RegularExpressions
 open System.Numerics
 
 let map data= 
-    String.split [| "\n"; "\r" |] data
-    |>Seq.filter(fun s -> String.length s>0)
+    Common.splitLines data
     |>Seq.map(function 
         s when Regex.IsMatch(s,@"^[\@\.]+$") -> String.toSeq s|>Seq.map(fun c-> if c='@' then 1uy else 0uy)
         | _ -> failwith "Incorrect map!" )
@@ -37,7 +36,7 @@ let part1 data=
     Seq.length(removable arr)
 
 let iter arr=
-    let r=Seq.toArray(removable arr)
+    let r=Seq.toArray(removable arr) // fix sequence into array
     for (i,j) in r do
         arr[i,j]<-0uy
     r.Length
@@ -51,7 +50,5 @@ let part2 data=
         yield lastRemovable
     }|>Seq.sum
     
-
-
 let Puzzle()=
     part2 Day4Year2025Inputs.data

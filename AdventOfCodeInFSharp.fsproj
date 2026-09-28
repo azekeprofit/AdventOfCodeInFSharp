@@ -7,14 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="common.fs" />
     <Compile Include="inputs\2025-1.fs" />
     <Compile Include="inputs\2025-2.fs" />
     <Compile Include="inputs\2025-3.fs" />
     <Compile Include="inputs\2025-4.fs" />
+    <Compile Include="inputs\2025-5.fs" />
     <Compile Include="2025\Day1.fs" />
     <Compile Include="2025\Day2.fs" />
     <Compile Include="2025\Day3.fs" />
     <Compile Include="2025\Day4.fs" />
+    <Compile Include="2025\Day5.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
