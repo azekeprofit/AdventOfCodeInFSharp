@@ -5,7 +5,7 @@ type range=Range of bigint * bigint
 
 let ranges data=seq {
     for line in String.split [| "," |] data do 
-        let ranges=String.split [|"-"|] line |> Seq.take(2) |>Seq.toList 
+        let ranges=String.split [|"-"|] line |> Seq.take 2 |>Seq.toList 
 
 
         let sng= match ranges with 

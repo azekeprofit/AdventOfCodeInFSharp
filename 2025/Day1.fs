@@ -7,11 +7,11 @@ type Command= Left of int | Right of int
 
 let lines data= seq {
     for line in String.split [| "\n"; "\r" |] data do     
-                let letter=line|>String.take(1)
-                let number=line|>String.skip(1) |> tryParse<int>
+                let letter=line|>String.take 1
+                let number=line|>String.skip 1 |> tryParse<int>
                 match letter, number with
-                    | "L", Some(n) -> yield Left n
-                    | "R", Some(n)-> yield Right n
+                    | "L", Some n -> yield Left n
+                    | "R", Some n -> yield Right n
                     | _ -> () }
     
 let part1 data = seq {
@@ -28,12 +28,12 @@ let turns n=abs n/100
 
 let turn {zeroes=z ; wheel=w} n=
     let sum=w+n 
-    { wheel=sum%100 |> function s when s<0 -> 100+s; | s ->s
+    { wheel=sum%100 |> function s when s<0 -> 100+s; | s -> s
       zeroes= match sum with 
                 | 0 -> z+1
-                | over100 when over100>=100 -> z+turns over100
-                | negative when negative<0 -> z+(if w<>0 then 1 else 0)+turns negative
-                | s -> z+turns s
+                | over100 when over100>=100 -> z + turns over100
+                | negative when negative<0 ->  z + (if w=0 then 0 else 1) + turns negative
+                | s -> z + turns s
      }
     
 let part2 data =

@@ -6,17 +6,16 @@ open System.Numerics
 
 let map data= 
     String.split [| "\n"; "\r" |] data
-    |>Seq.filter(fun s -> String.length(s)>0)
+    |>Seq.filter(fun s -> String.length s>0)
     |>Seq.map(function 
-        s when Regex.IsMatch(s,@"^[\@\.]+$") -> s|>String.toSeq|>Seq.map(fun c-> if c='@' then 1uy else 0uy)
+        s when Regex.IsMatch(s,@"^[\@\.]+$") -> String.toSeq s|>Seq.map(fun c-> if c='@' then 1uy else 0uy)
         | _ -> failwith "Incorrect map!" )
     |>array2D
 
 let adjacent i j=seq{
         yield (i-1,j-1); yield (i-1,j); yield (i-1,j+1)
         yield (i,j-1);                  yield (i,j+1)
-        yield (i+1,j-1); yield (i+1,j); yield (i+1,j+1)
-        }
+        yield (i+1,j-1); yield (i+1,j); yield (i+1,j+1)  }
 
 let adjacentCells arr i j=seq {
     for (x,y) in adjacent i j do
@@ -29,7 +28,7 @@ let removable arr=seq {
     for i in 0 .. Array2D.length1 arr - 1 do
         for j in 0 .. Array2D.length2 arr - 1 do
             if arr[i,j]=1uy then
-                let a=(adjacentCells arr i j)|>Seq.length
+                let a=Seq.length(adjacentCells arr i j)
                 if a<4 then yield (i,j) }
 
 
@@ -44,7 +43,7 @@ let iter arr=
     r.Length
 
 let part2 data=
-    let arr= map data
+    let arr=map data
     seq {
     let mutable lastRemovable=1
     while(lastRemovable<>0) do 
