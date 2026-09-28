@@ -31,8 +31,8 @@ let turn {zeroes=z ; wheel=w} n=
     { wheel=sum%100 |> function s when s<0 -> 100+s; | s ->s
       zeroes= match sum with 
                 | 0 -> z+1
-                | s when s>=100 -> z+turns s
-                | s when s<0 -> z+(if w<>0 then 1 else 0)+turns s
+                | over100 when over100>=100 -> z+turns over100
+                | negative when negative<0 -> z+(if w<>0 then 1 else 0)+turns negative
                 | s -> z+turns s
      }
     
