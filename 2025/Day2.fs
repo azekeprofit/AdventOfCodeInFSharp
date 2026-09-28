@@ -37,7 +37,7 @@ let part2 data=seq {
                     if len%size=0 then 
                         let chunks=Seq.chunkBySize size strSeq
                         let first=chunks|>Seq.item 0
-                        if not (chunks|>Seq.exists (function c -> c <> first)) then 
+                        if not (chunks|>Seq.exists (fun c -> c <> first)) then 
                             yield n }|>Seq.truncate 1
                 yield! repeatedChunk
                 } |> Seq.sum

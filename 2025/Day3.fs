@@ -4,8 +4,8 @@ open System.Text.RegularExpressions
 open System.Numerics
 
 let banks data=
-    let result=String.split [| "\n"; "\r" |] data |>Seq.filter(function s -> String.length(s)>0)
-    result|>Seq.iter(function s -> if not(Regex.IsMatch(s,@"^\d+$")) then failwith "Incorrect battery joltage data!")
+    let result=String.split [| "\n"; "\r" |] data |>Seq.filter(fun s -> String.length(s)>0)
+    result|>Seq.iter(fun s -> if not(Regex.IsMatch(s,@"^\d+$")) then failwith "Incorrect battery joltage data!")
     result
 
 let part1 bank=seq { 
@@ -34,7 +34,7 @@ let rec iteration (batteries:bigint) (bank:byte[]) start endd remainder=seq{
 
 let part2 bank=seq {
         let size=12
-        let bankArray=bank|>String.getBytes(System.Text.Encoding.ASCII)|>Array.map(function b->b-48uy)
+        let bankArray=bank|>String.getBytes(System.Text.Encoding.ASCII)|>Array.map(fun b->b-48uy)
         yield! iteration 0 bankArray 0 (bank.Length-size) size
                 }|>Seq.max
 
