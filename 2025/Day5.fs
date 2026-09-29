@@ -20,21 +20,18 @@ let parseIngredients s=[
             | Some s -> yield Ingredient s
             | _-> failwith "Incorrect ingredient id format" ]
 
-let parseArr data=
+let parse data=
     let arr=Regex.Split(data, @"\n\r?\n\r?")
     if arr.Length<>2 then failwith "Incorrect input format"
-    arr
+    (parseRanges arr[0], parseIngredients arr[1])
         
 let spoiled (Ingredient i) ranges=
     ranges|>List.exists(function Range(s, e) -> s<=i && i<=e) 
 
 let part1 data=
-    let arr=parseArr data
-    let ingredients=parseIngredients arr[0]
-    let ranges=parseRanges arr[1]
+    let (ranges,ingredients)=parse data
     ingredients
-    |>Seq.map(fun i -> if spoiled i ranges then 1 else 0)
-    |>Seq.sum
+    |>Seq.sumBy(fun i -> if spoiled i ranges then 1 else 0)
 
 
 type intersections=
@@ -45,6 +42,7 @@ type indexedRanges=IndexedRange of bigint * bigint * int
 let indexRanges ranges=
     ranges|>Array.mapi(fun i (Range(s,e)) -> IndexedRange(s,e,i))
 
+[<TailCall>]
 let rec iter aligned (Range(s,e))=
     let intersection=indexRanges aligned
                     |>Array.tryPick(function 
@@ -53,26 +51,19 @@ let rec iter aligned (Range(s,e))=
                          |IndexedRange(a, b, i) when a<=s && s<=b -> Some(Intersection(a, max b e, i))
                          |IndexedRange(a, b, i) when a<=e && e<=b -> Some(Intersection(min a s, b, i))
                          | _ -> None)
+
     match intersection with
         | Some FullyEnvelops -> aligned
-        | None -> 
-            seq{ 
-            yield! aligned
-            yield Range(s,e) 
-            }|>Seq.toArray
+        | None -> [| yield! aligned; yield Range(s,e) |]
         | Some(Intersection(a,b,i)) -> 
-            let newAligned=aligned|>Array.removeAt i
+            let newAligned=aligned |> Array.removeAt i
             iter newAligned (Range(a,b))
 
 
 let part2 data=
-    let arr=parseArr data
-    let ranges=parseRanges arr[0]
+    let (ranges,_)=parse data
     let aligned=fold iter Array.empty ranges
-    seq {
-    for Range(s,e) in aligned do
-    yield e-s+1I
-    }|>Seq.sum
+    aligned |> Array.sumBy(fun (Range(s,e)) -> e-s+1I)
         
 
 let Puzzle()=
