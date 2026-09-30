@@ -6,17 +6,28 @@ open System.Numerics
 
 type operation=Addition | Multiplication
 
+let parseOps line=[
+    for op in line |> Common.splitBySpaces do
+        match op with 
+            | "+" -> yield Addition
+            | "*" -> yield Multiplication
+            | _ -> failwith "Incorrect operations row" ]
+
+                
+let parseLines data=
+    let lines=Seq.toArray(Common.splitLines data)
+    let table=lines|>Array.take(lines.Length-1)
+    let ops=parseOps(Array.last lines)
+    (table,ops)
+
+let transpose table=
+    Array2D.init (Array2D.length2 table) (Array2D.length1 table) (fun i j -> table[j, i])
+
 let parse data=
-    let lines=Common.splitLines data |> Seq.toArray
-    let operations=[
-        for op in lines |> Array.last |> Common.splitBySpaces do
-            match op with 
-                | "+" -> yield Addition
-                | "*" -> yield Multiplication
-                | _ -> failwith "Incorrect operations row" ]
+    let (lines,ops)=parseLines data
 
     let array=seq {
-        for line in lines|>Array.take (lines.Length-1) do    
+        for line in lines do    
             yield seq{
               for number in Common.splitBySpaces line |> Seq.map(tryParse<bigint>) do
                 match number with 
@@ -24,28 +35,20 @@ let parse data=
                     | _ -> failwith "Incorrect numbers table" }
                     }|>array2D
 
-    if array|>Array2D.length2<>operations.Length then failwith "Numbers and operations don't match"
-    (operations,array)
-    
+    if array|>Array2D.length2<>ops.Length then failwith "Numbers and operations don't match"
+    (transpose array,ops)
 
 
 let part1 data=
-    let (ops,arr)=parse data
+    let (arr,ops)=parse data
+    ops
+    |>List.mapi(fun i op -> 
+        match op with
+        | Addition -> arr[i,0..]|>Seq.sum
+        | Multiplication-> fold (*) 1I arr[i,0..]
+    )|>List.sum
     
-    let processRow (sum:bigint array) (row:bigint array)=
-        row|>Array.mapi(fun i v->
-                match ops[i] with
-                    | Addition -> v+sum[i]
-                    | Multiplication-> v*sum[i])
-
-    let firstRow=arr[0,0..]
-    let restOfRow=seq{ 
-        for i in 1..(Array2D.length1 arr)-1 do
-            yield arr[i,0..] }
-    let final=fold processRow firstRow restOfRow
-    Array.sum final
-
 
 
 let Puzzle()=
-    part1 Day6Year2025Inputs.data
+    part1 Day6Year2025Inputs.example
