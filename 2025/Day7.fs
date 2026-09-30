@@ -14,7 +14,7 @@ let (|FirstLine|) line=
         |>Seq.tryExactlyOne
 
 let (|Spacer|) (line:string)=
-    if Regex.IsMatch(line,@"^\.+$") then Some () else None
+    if Regex.IsMatch(line,@"^\.+$") then Some line.Length else None
 
 let (|Splitters|) line=
     line    
@@ -24,10 +24,15 @@ let (|Splitters|) line=
             | '.' -> None
             | _ -> failwith "Incorrect 1st line format")|>Seq.toList
         
+type state={width:int; beams:int list list}
+
 let rec tree lines=
     match lines with
-        | Spacer _ :: Splitters splitters :: rest -> [splitters] @ tree rest
-        | [Spacer _] -> []
+        | Spacer(Some(width)) :: Splitters splitters :: rest -> 
+            let {width=w;beams=b}=tree rest
+            if w<>width then failwith "Line widths don't match"
+            {width=width; beams=[splitters] @ b }
+        | [Spacer(Some(width))] -> {width=width; beams=[]}
         | _ -> failwith "Incorrect tree format"
 
 let lines data=
@@ -37,10 +42,24 @@ let lines data=
     | _ -> failwith "Incorrect input data"
 
 
+type splitCounter={counter:int; beams:int list}
 let part1 data=
-    let (start,splitters)=lines data
-    123
+    let (start, {width=width; beams=splitters})=lines data
+
+    let fall {beams=beams; counter=c} splitters=
+        let mutable newC=c
+        let newBeams=[
+            for b in beams do
+                if splitters|>List.contains b then 
+                    newC<-newC+1
+                    if b>0 then yield b-1
+                    if b<width-1 then yield b+1
+                else yield b     ]|>List.distinct
+        {beams=newBeams; counter=newC}
+
+    let final=fold fall {counter=0;beams=[start]} splitters
+    final.counter
 
 
 let Puzzle()=
-    part1 Day7Year2025Inputs.example
+    part1 Day7Year2025Inputs.data
