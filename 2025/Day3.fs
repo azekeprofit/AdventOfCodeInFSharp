@@ -3,22 +3,27 @@ open FSharpPlus
 open System.Text.RegularExpressions
 open System.Numerics
 
+
 let banks data=
         Common.splitLines data
         |>Seq.map(function 
                     s when not(Regex.IsMatch(s,@"^\d+$")) -> failwith "Incorrect battery joltage data!"
                     |s->s)
 
-let part1 bank=seq { 
-        let len=String.length bank
-        for i in 0..len-2 do 
-            for secondDigit in bank[i+1..len-1] do
-                yield $"{bank[i]}{secondDigit}"
-                  } |>Seq.max
+let part1 bank=
+    let maxJoltage=seq { 
+            let len=String.length bank
+            for i in 0..len-2 do 
+                for secondDigit in bank[i+1..len-1] do
+                    yield $"{bank[i]}{secondDigit}"
+                      } |>Seq.max
+    match tryParse<int> maxJoltage with
+        | Some n -> n
+        | _ -> failwith "This is not supposed happen"
 
 [<TailCall>] // as of F# 10, yield!-ed tail call recursion *should* be unrolled into loop automatically
 // this attribute is here just to cause warnings if in the future function is changed and it's no longer tail-callable
-let rec iteration (batteries:bigint) (bank:byte array) start endd remainder=seq{
+let rec iteration batteries (bank:byte array) start endd remainder=seq{
     match remainder with
         | 0 -> yield batteries/10I // this never runs, because last stage of recursion gets captured by 1 case below
         | 1 -> yield batteries+bigint(Seq.max bank[start..endd]) // last digit is always maximum of remaining batteries
@@ -40,6 +45,6 @@ let part2 bank=seq {
                 }|>Seq.max
 
 let Puzzle()=
-    let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2
+    let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2 
     // let list=allCombinations |>Seq.toArray
     allCombinations |>Seq.sum
