@@ -47,26 +47,49 @@ let lines data=
 type splitCounter={counter:int; beams:int list}
 type fallResult=BeamSplit of int list | Passthrough of int
 
+let splitBeams beams splitters width=
+        beams|>List.map(fun b-> 
+                if splitters|>List.contains b 
+                then BeamSplit [
+                    if b>0 then yield b-1
+                    if b<width-1 then yield b+1 ]
+                else Passthrough b)
+
+let collectBeams result=[ 
+    for r in result do
+                match r with 
+                | BeamSplit list -> yield! list
+                | Passthrough b -> yield b ]
+
 let part1 data=
     let (start, splitters, width)=lines data
 
     let fall state splitters=
-        let result=state.beams|>List.map(fun b-> 
-            if splitters|>List.contains b 
-            then BeamSplit [
-                if b>0 then yield b-1
-                if b<width-1 then yield b+1 ]
-            else Passthrough b)
-
-        {beams=[ for r in result do
-                    match r with 
-                    | BeamSplit list -> yield! list
-                    | Passthrough b -> yield b ]|>List.distinct;
+        let result=splitBeams state.beams splitters width
+        {beams=(collectBeams result)|>List.distinct;
         counter=state.counter+(result|>Seq.filter(function BeamSplit _ -> true | _ -> false)|>Seq.length)}
 
     let final=fold fall {beams=[start];counter=0} splitters
     final.counter
 
+let sumTimelines beams=beams|>List.map(function (_,t)->t)|>List.sum
+
+let splitQuantumBeams width beams splitters=
+        beams|>List.map(function
+            | (b, timelines) as q ->
+                if splitters|>List.contains b
+                then [
+                    if b>0 then yield (b-1, timelines)
+                    if b<width-1 then yield (b+1, timelines) ]
+                else [q])
+                |>List.concat
+                |>List.groupBy(function (b,_) ->b)
+                |>List.map(fun (b,list)->(b,sumTimelines list))
+
+let part2 data=
+    let (start, splitters, width)=lines data
+    let final=fold (splitQuantumBeams width) [(start,1I)] splitters
+    sumTimelines final
 
 let Puzzle()=
-    part1 Day7Year2025Inputs.example
+    part2 Day7Year2025Inputs.data
