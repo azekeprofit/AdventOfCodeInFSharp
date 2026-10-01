@@ -67,28 +67,29 @@ let part1 data=
     let fall state splitters=
         let result=splitBeams state.beams splitters width
         {beams=(collectBeams result)|>List.distinct;
-        counter=state.counter+(result|>Seq.filter(function BeamSplit _ -> true | _ -> false)|>Seq.length)}
+        counter=state.counter+(result|>Seq.sumBy(function BeamSplit _ -> 1 | _ -> 0))}
 
     let final=fold fall {beams=[start];counter=0} splitters
     final.counter
 
-let sumTimelines beams=beams|>List.map(function (_,t)->t)|>List.sum
+type quantumBeams=QBeams of int * bigint // quantum beams of position and how many timelines are inside
+let sumTimelines=List.sumBy(function QBeams(_,t)->t)
 
 let splitQuantumBeams width beams splitters=
         beams|>List.map(function
-            | (b, timelines) as q ->
+            | QBeams(b, timelines) as q ->
                 if splitters|>List.contains b
                 then [
-                    if b>0 then yield (b-1, timelines)
-                    if b<width-1 then yield (b+1, timelines) ]
+                    if b>0 then yield QBeams(b-1, timelines)
+                    if b<width-1 then yield QBeams(b+1, timelines) ]
                 else [q])
                 |>List.concat
-                |>List.groupBy(function (b,_) ->b)
-                |>List.map(fun (b,list)->(b,sumTimelines list))
+                |>List.groupBy(function QBeams(b,_) ->b)
+                |>List.map(fun (b,list)->QBeams(b,sumTimelines list))
 
 let part2 data=
     let (start, splitters, width)=lines data
-    let final=fold (splitQuantumBeams width) [(start,1I)] splitters
+    let final=fold (splitQuantumBeams width) [QBeams(start,1I)] splitters
     sumTimelines final
 
 let Puzzle()=
