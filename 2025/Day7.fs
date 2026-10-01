@@ -23,14 +23,12 @@ let (|Splitters|) line=
             | '^' -> Some i
             | '.' -> None
             | _ -> failwith "Incorrect splitters line format")|>Seq.toList
-        
-type state={width:int; beams:int list list}
 
 let rec tree lines width=
     match lines with
         | Spacer(Some w) :: Splitters splitters :: rest -> 
             if w<>width then failwith "Line widths don't match"
-            [splitters] @ (tree rest width)
+            [splitters] @ tree rest width
         | [Spacer(Some w)] ->
             if w<>width then failwith "Line widths don't match"
             []
@@ -39,7 +37,7 @@ let rec tree lines width=
 let lines data=
     let lines=Seq.toList(Common.splitLines data)
     match lines with
-    | FirstLine(Some start, width) :: rest -> (start,tree rest width,width)
+    | FirstLine(Some start, width) :: rest -> start, width, tree rest width
     | _ -> failwith "Incorrect input data"
 
 
@@ -62,11 +60,11 @@ let collectBeams result=[
                 | Passthrough b -> yield b ]
 
 let part1 data=
-    let (start, splitters, width)=lines data
+    let start, width, splitters=lines data
 
     let fall state splitters=
         let result=splitBeams state.beams splitters width
-        {beams=(collectBeams result)|>List.distinct;
+        {beams=collectBeams result|>List.distinct;
         counter=state.counter+(result|>Seq.sumBy(function BeamSplit _ -> 1 | _ -> 0))}
 
     let final=fold fall {beams=[start];counter=0} splitters
@@ -88,7 +86,7 @@ let splitQuantumBeams width beams splitters=
                 |>List.map(fun (b,list)->QBeams(b,sumTimelines list))
 
 let part2 data=
-    let (start, splitters, width)=lines data
+    let start, width, splitters=lines data
     let final=fold (splitQuantumBeams width) [QBeams(start,1I)] splitters
     sumTimelines final
 

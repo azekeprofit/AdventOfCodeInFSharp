@@ -12,9 +12,9 @@ let map data=
     |>array2D
 
 let adjacent i j=seq{
-        yield (i-1,j-1); yield (i-1,j); yield (i-1,j+1)
-        yield (i,j-1);                  yield (i,j+1)
-        yield (i+1,j-1); yield (i+1,j); yield (i+1,j+1)  }
+        yield i-1,j-1; yield i-1,j; yield i-1,j+1
+        yield i,j-1;                  yield i,j+1
+        yield i+1,j-1; yield i+1,j; yield i+1,j+1  }
 
 let adjacentCells arr i j=seq {
     for (x,y) in adjacent i j do
@@ -28,7 +28,7 @@ let removable arr=seq {
         for j in 0 .. Array2D.length2 arr - 1 do
             if arr[i,j]=1uy then
                 let a=Seq.length(adjacentCells arr i j)
-                if a<4 then yield (i,j) }
+                if a<4 then yield i,j }
 
 
 let part1 data=

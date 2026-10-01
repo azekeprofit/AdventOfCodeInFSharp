@@ -29,7 +29,7 @@ let spoiled (Ingredient i) ranges=
     ranges|>List.exists(function Range(s, e) -> s<=i && i<=e) 
 
 let part1 data=
-    let (ranges,ingredients)=parse data
+    let ranges,ingredients=parse data
     ingredients
     |>Seq.sumBy(fun i -> if spoiled i ranges then 1 else 0)
 
@@ -61,7 +61,7 @@ let rec iter aligned (Range(s,e))=
 
 
 let part2 data=
-    let (ranges,_)=parse data
+    let ranges,_=parse data
     let aligned=fold iter Array.empty ranges
     aligned |> Array.sumBy(fun (Range(s,e)) -> e-s+1I)
         

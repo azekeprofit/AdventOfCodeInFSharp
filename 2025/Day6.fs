@@ -19,13 +19,13 @@ let parseLines data=
     let lines=Seq.toArray(Common.splitLines data)
     let table=lines|>Array.take(lines.Length-1)
     let ops=parseOps(Array.last lines)
-    (table,ops)
+    table,ops
 
 let transpose table=
     Array2D.init (Array2D.length2 table) (Array2D.length1 table) (fun i j -> table[j, i])
 
 let part1 data=
-    let (lines,ops)=parseLines data
+    let lines,ops=parseLines data
 
     let arr=seq {
         for line in lines do    
@@ -46,7 +46,7 @@ let part1 data=
     )|>Seq.sum
 
 let part2 data=
-    let (lines,ops)=parseLines data
+    let lines,ops=parseLines data
     let chars=lines|>Array.map String.toSeq|>array2D|>transpose
     let numbers=seq {
                 let buffer=ResizeArray()
