@@ -11,7 +11,7 @@ let (|FirstLine|) line=
             | 'S' -> Some i
             | '.' -> None
             | _ -> failwith "Incorrect 1st line format") 
-        |>Seq.tryExactlyOne
+        |>Seq.tryExactlyOne, line|>Seq.length
 
 let (|Spacer|) (line:string)=
     if Regex.IsMatch(line,@"^\.+$") then Some line.Length else None
@@ -22,44 +22,51 @@ let (|Splitters|) line=
         match c with
             | '^' -> Some i
             | '.' -> None
-            | _ -> failwith "Incorrect 1st line format")|>Seq.toList
+            | _ -> failwith "Incorrect splitters line format")|>Seq.toList
         
 type state={width:int; beams:int list list}
 
-let rec tree lines=
+let rec tree lines width=
     match lines with
-        | Spacer(Some(width)) :: Splitters splitters :: rest -> 
-            let {width=w;beams=b}=tree rest
+        | Spacer(Some w) :: Splitters splitters :: rest -> 
             if w<>width then failwith "Line widths don't match"
-            {width=width; beams=[splitters] @ b }
-        | [Spacer(Some(width))] -> {width=width; beams=[]}
+            [splitters] @ (tree rest width)
+        | [Spacer(Some w)] ->
+            if w<>width then failwith "Line widths don't match"
+            []
         | _ -> failwith "Incorrect tree format"
 
 let lines data=
     let lines=Seq.toList(Common.splitLines data)
     match lines with
-    | FirstLine(Some start) :: rest -> (start,tree rest)
+    | FirstLine(Some start, width) :: rest -> (start,tree rest width,width)
     | _ -> failwith "Incorrect input data"
 
 
+
 type splitCounter={counter:int; beams:int list}
+type fallResult=BeamSplit of int list | Passthrough of int
+
 let part1 data=
-    let (start, {width=width; beams=splitters})=lines data
+    let (start, splitters, width)=lines data
 
-    let fall {beams=beams; counter=c} splitters=
-        let mutable newC=c
-        let newBeams=[
-            for b in beams do
-                if splitters|>List.contains b then 
-                    newC<-newC+1
-                    if b>0 then yield b-1
-                    if b<width-1 then yield b+1
-                else yield b     ]|>List.distinct
-        {beams=newBeams; counter=newC}
+    let fall state splitters=
+        let result=state.beams|>List.map(fun b-> 
+            if splitters|>List.contains b 
+            then BeamSplit [
+                if b>0 then yield b-1
+                if b<width-1 then yield b+1 ]
+            else Passthrough b)
 
-    let final=fold fall {counter=0;beams=[start]} splitters
+        {beams=[ for r in result do
+                    match r with 
+                    | BeamSplit list -> yield! list
+                    | Passthrough b -> yield b ]|>List.distinct;
+        counter=state.counter+(result|>Seq.filter(function BeamSplit _ -> true | _ -> false)|>Seq.length)}
+
+    let final=fold fall {beams=[start];counter=0} splitters
     final.counter
 
 
 let Puzzle()=
-    part1 Day7Year2025Inputs.data
+    part1 Day7Year2025Inputs.example
