@@ -13,11 +13,11 @@ let map data=
 
 let adjacent i j=seq{
         yield i-1,j-1; yield i-1,j; yield i-1,j+1
-        yield i,j-1;                  yield i,j+1
+        yield i,  j-1;              yield i,  j+1
         yield i+1,j-1; yield i+1,j; yield i+1,j+1  }
 
 let adjacentCells arr i j=seq {
-    for (x,y) in adjacent i j do
+    for x,y in adjacent i j do
         if 0<=x && x<Array2D.length1 arr &&     // why do i have to do bounds checking manually?
            0<=y && y<Array2D.length2 arr then
             if arr[x,y]=1uy then yield 1uy }
@@ -37,7 +37,7 @@ let part1 data=
 
 let iter arr=
     let r=Seq.toArray(removable arr) // fix sequence into array
-    for (i,j) in r do
+    for i,j in r do
         arr[i,j]<-0uy
     r.Length
 

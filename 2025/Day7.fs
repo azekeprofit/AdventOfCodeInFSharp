@@ -71,19 +71,19 @@ let part1 data=
     final.counter
 
 type quantumBeams=QBeams of int * bigint // quantum beams of position and how many timelines are inside
-let sumTimelines=List.sumBy(function QBeams(_,t)->t)
+let sumTimelines=Seq.sumBy(function QBeams(_,t)->t)
 
 let splitQuantumBeams width beams splitters=
-        beams|>List.map(function
-            | QBeams(b, timelines) as q ->
-                if splitters|>List.contains b
-                then [
-                    if b>0 then yield QBeams(b-1, timelines)
-                    if b<width-1 then yield QBeams(b+1, timelines) ]
-                else [q])
-                |>List.concat
-                |>List.groupBy(function QBeams(b,_) ->b)
-                |>List.map(fun (b,list)->QBeams(b,sumTimelines list))
+            seq{
+            for QBeams(b, timelines) in beams do
+                    if splitters|>List.contains b
+                    then 
+                        if b>0 then yield QBeams(b-1, timelines)
+                        if b<width-1 then yield QBeams(b+1, timelines)
+                    else yield QBeams(b, timelines)}
+            |>Seq.groupBy(function QBeams(b,_) ->b)
+            |>Seq.map(fun (b,list)->QBeams(b,sumTimelines list))
+            |>Seq.toList
 
 let part2 data=
     let start, width, splitters=lines data
