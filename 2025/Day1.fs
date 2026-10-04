@@ -8,7 +8,7 @@ type Command= Left of int | Right of int
 let lines data= seq {
     for line in Common.splitLines data do     
                 let letter=line|>String.take 1
-                let number=line|>String.skip 1 |> tryParse<int>
+                let number=line|>String.skip 1|>tryParse
                 match letter, number with
                     | "L", Some n -> Left n
                     | "R", Some n -> Right n

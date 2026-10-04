@@ -29,7 +29,7 @@ let rec tree lines width=
         | Spacer(Some w) :: Splitters splitters :: rest -> 
             if w<>width then failwith "Line widths don't match"
             [splitters] @ tree rest width
-        | [Spacer(Some w)] ->
+        | Spacer(Some w) :: [] ->
             if w<>width then failwith "Line widths don't match"
             []
         | _ -> failwith "Incorrect tree format"
@@ -74,16 +74,16 @@ type quantumBeams=QBeams of int * bigint // quantum beams of position and how ma
 let sumTimelines=Seq.sumBy(function QBeams(_,t)->t)
 
 let splitQuantumBeams width beams splitters=
-            seq{
-            for QBeams(b, timelines) in beams do
-                    if splitters|>List.contains b
-                    then 
-                        if b>0 then QBeams(b-1, timelines)
-                        if b<width-1 then QBeams(b+1, timelines)
-                    else QBeams(b, timelines)}
-            |>Seq.groupBy(function QBeams(b,_) ->b)
-            |>Seq.map(fun (b,list)->QBeams(b,sumTimelines list))
-            |>Seq.toList
+            let groups=seq{
+                for QBeams(b, timelines) in beams do
+                        if splitters|>List.contains b
+                        then 
+                            if b>0 then QBeams(b-1, timelines)
+                            if b<width-1 then QBeams(b+1, timelines)
+                        else QBeams(b, timelines) }
+                        |>Seq.groupBy(function QBeams(b,_) ->b)
+            [ for b,list in groups do 
+                    QBeams(b,sumTimelines list) ]
 
 let part2 data=
     let start, width, splitters=lines data

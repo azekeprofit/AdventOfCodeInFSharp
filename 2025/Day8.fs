@@ -8,9 +8,9 @@ open System.Numerics
 let lines data=[
     let l=Common.splitLines data
     for line in l do
-        let point=Common.splitBy [|","|] line |>Seq.toArray
-        match tryParseArray point with
-            | Some(x,y,z) -> x,y,z
+        let point=Common.splitBy [|","|] line|>Seq.map(tryParse)|>Seq.toList
+        match point with
+            | Some x :: Some y :: Some z :: [] -> x,y,z
             | _ -> failwith "Wrong points format" ]
 
 let sq x=x*x
