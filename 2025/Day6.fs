@@ -30,7 +30,7 @@ let part1 data=
     let arr=seq {
         for line in lines do    
             seq{
-              for number in Common.splitBySpaces line |> Seq.map(tryParse<bigint>) do
+              for number in Common.splitBySpaces line |> Seq.map tryParse do
                 match number with 
                     | Some n -> n 
                     | _ -> failwith "Incorrect numbers table" }

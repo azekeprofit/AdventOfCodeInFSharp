@@ -12,7 +12,7 @@ let lines data= seq {
                 match letter, number with
                     | "L", Some n -> Left n
                     | "R", Some n -> Right n
-                    | _ -> () }
+                    | _ -> failwith "Wrong input format" }
     
 let part1 data = seq {
         let mutable wheel=50

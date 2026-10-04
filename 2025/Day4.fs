@@ -43,12 +43,11 @@ let iter arr=
 
 let part2 data=
     let arr=map data
-    seq {
-    let mutable lastRemovable=1
-    while(lastRemovable<>0) do 
-        lastRemovable<-iter arr
-        lastRemovable
-    }|>Seq.sum
+    Seq.initInfinite(fun _->arr)
+    |>Seq.map iter
+    |>Seq.takeWhile(fun v-> v<>0)
+    |>Seq.sum
+    
     
 let Puzzle()=
     part2 Day4Year2025Inputs.data

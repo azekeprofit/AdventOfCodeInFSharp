@@ -9,7 +9,7 @@ type ingredient=Ingredient of bigint
 
 let parseRanges s=[
     for line in Common.splitLines s do
-        let r=String.split [| "-" |] line |>Seq.map(tryParse)|>Seq.toList
+        let r=String.split [| "-" |] line |>Seq.map tryParse|>Seq.toList
         match r with
             | Some s :: Some e :: [] -> Range(s, e)
             | _ -> failwith "Incorrect range format" ]

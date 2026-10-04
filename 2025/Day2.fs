@@ -5,9 +5,9 @@ type range=Range of bigint * bigint
 
 let ranges data=seq {
     for line in String.split [| "," |] data do 
-        let ranges=String.split [|"-"|] line |> Seq.take 2 |> Seq.toArray
-        match tryParseArray ranges with 
-            | Some (s,e) -> Range(s, e)
+        let ranges=String.split [|"-"|] line |> Seq.map tryParse|>Seq.toList
+        match ranges with 
+            | Some s :: Some e :: [] -> Range(s, e)
             | _-> failwith "Incorrect range format" }
 
 let part1 data=seq { 

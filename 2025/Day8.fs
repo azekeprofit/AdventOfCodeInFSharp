@@ -8,13 +8,13 @@ open System.Numerics
 let lines data=[
     let l=Common.splitLines data
     for line in l do
-        let point=Common.splitBy [|","|] line|>Seq.map(tryParse)|>Seq.toList
+        let point=Common.splitBy [|","|] line|>Seq.map tryParse<uint64>|>Seq.toList
         match point with
             | Some x :: Some y :: Some z :: [] -> x,y,z
             | _ -> failwith "Wrong points format" ]
 
 let sq x=x*x
-let distanceSq (x,y,z) (a,b,c)=(sq x-a)+(sq y-b)+(sq z+c)
+let distanceSq (x,y,z) (a,b,c)=sq(x-a)+sq(y-b)+sq(z-c)
 // no need to calculate square root
 
 
@@ -24,10 +24,10 @@ let Puzzle()=
     let connections=ResizeArray()
     let r=seq{
             let indexed=Seq.indexed points
-            for a,b in Seq.allPairs indexed indexed do
-                let i,aPoint=a
-                let j,bPoint=b
-                distanceSq aPoint bPoint, i, j}
+            for (i,a),(j,b) in Seq.allPairs indexed indexed do
+                if i<>j then 
+                    distanceSq a b, i, j
+                }
             |>Seq.sortBy(fun (d,_,_) -> d)|>Seq.truncate 10|>Seq.toList
 
     999
