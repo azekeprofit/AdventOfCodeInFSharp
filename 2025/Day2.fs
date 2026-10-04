@@ -7,7 +7,7 @@ let ranges data=seq {
     for line in String.split [| "," |] data do 
         let ranges=String.split [|"-"|] line |> Seq.take 2 |> Seq.toArray
         match tryParseArray ranges with 
-            | Some (s,e) -> yield Range(s, e)
+            | Some (s,e) -> Range(s, e)
             | _-> failwith "Incorrect range format" }
 
 let part1 data=seq { 
@@ -16,7 +16,7 @@ let part1 data=seq {
             let s=n.ToString()
             let len=s.Length
 
-            if len%2=0 && s[0..len/2-1]=s[len/2..] then yield n } |>Seq.sum
+            if len%2=0 && s[0..len/2-1]=s[len/2..] then n } |>Seq.sum
 
 
 let part2 data=seq {
@@ -31,8 +31,8 @@ let part2 data=seq {
                     if len%size=0 then 
                         let chunks=Seq.chunkBySize size strSeq
                         let first=chunks|>Seq.item 0
-                        if not (chunks|>Seq.exists (fun c -> c <> first)) then 
-                            yield n }|>Seq.truncate 1
+                        if not (chunks|>Seq.exists (fun c -> c <> first)) 
+                        then n    }|>Seq.truncate 1
                 yield! repeatedChunk
                 } |> Seq.sum
 

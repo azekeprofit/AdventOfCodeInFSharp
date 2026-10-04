@@ -49,8 +49,8 @@ let splitBeams beams splitters width=
         beams|>List.map(fun b-> 
                 if splitters|>List.contains b 
                 then BeamSplit [
-                    if b>0 then yield b-1
-                    if b<width-1 then yield b+1 ]
+                    if b>0 then b-1
+                    if b<width-1 then b+1 ]
                 else Passthrough b)
 
 let collectBeams result=[ 
@@ -78,9 +78,9 @@ let splitQuantumBeams width beams splitters=
             for QBeams(b, timelines) in beams do
                     if splitters|>List.contains b
                     then 
-                        if b>0 then yield QBeams(b-1, timelines)
-                        if b<width-1 then yield QBeams(b+1, timelines)
-                    else yield QBeams(b, timelines)}
+                        if b>0 then QBeams(b-1, timelines)
+                        if b<width-1 then QBeams(b+1, timelines)
+                    else QBeams(b, timelines)}
             |>Seq.groupBy(function QBeams(b,_) ->b)
             |>Seq.map(fun (b,list)->QBeams(b,sumTimelines list))
             |>Seq.toList

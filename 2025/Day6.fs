@@ -29,10 +29,10 @@ let part1 data=
 
     let arr=seq {
         for line in lines do    
-            yield seq{
+            seq{
               for number in Common.splitBySpaces line |> Seq.map(tryParse<bigint>) do
                 match number with 
-                    | Some n -> yield n 
+                    | Some n -> n 
                     | _ -> failwith "Incorrect numbers table" }
                     }|>array2D
 
@@ -41,7 +41,7 @@ let part1 data=
     let rotated=transpose arr
     ops|>Seq.mapi(fun i op -> 
         match op with
-        | Addition -> rotated[i,0..]|>Seq.sum
+        | Addition -> sum rotated[i,0..]
         | Multiplication-> fold (*) 1I rotated[i,0..]
     )|>Seq.sum
 
@@ -54,9 +54,9 @@ let part2 data=
                     match String.ofSeq chars[i-1,0..] |> tryParse<bigint> with
                         | Some n -> buffer.Add n
                         | None -> 
-                            yield buffer.ToArray()
+                            buffer.ToArray()
                             buffer.Clear()
-                if buffer.Count<>0 then yield buffer.ToArray()
+                if buffer.Count<>0 then buffer.ToArray()
                 }|>Seq.toArray
 
     if numbers.Length<>ops.Length then failwith "Numbers don't correspond to operations"
@@ -64,7 +64,7 @@ let part2 data=
     ops
     |>Seq.mapi(fun i op -> 
         match op with
-        | Addition -> numbers[i]|>Array.sum
+        | Addition -> sum numbers[i]
         | Multiplication-> fold (*) 1I numbers[i]
     )|>Seq.sum
 

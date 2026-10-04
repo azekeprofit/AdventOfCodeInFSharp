@@ -10,15 +10,15 @@ let lines data= seq {
                 let letter=line|>String.take 1
                 let number=line|>String.skip 1 |> tryParse<int>
                 match letter, number with
-                    | "L", Some n -> yield Left n
-                    | "R", Some n -> yield Right n
+                    | "L", Some n -> Left n
+                    | "R", Some n -> Right n
                     | _ -> () }
     
 let part1 data = seq {
         let mutable wheel=50
         for c in lines data do
             wheel<- (match c with | Left n->wheel-n+100; | Right n->wheel+n)%100
-            yield if wheel=0 then 1 else 0 } |> Seq.sum
+            if wheel=0 then 1 else 0 } |> Seq.sum
 
 
 

@@ -11,13 +11,13 @@ let parseRanges s=[
     for line in Common.splitLines s do
         let r=String.split [| "-" |] line |> Seq.truncate 2 |> Seq.toArray
         match tryParseArray r with
-            | Some (s, e) -> yield Range(s, e)
+            | Some (s, e) -> Range(s, e)
             | _-> failwith "Incorrect range format" ]
 
 let parseIngredients s=[
     for line in Common.splitLines s do
         match tryParse line with
-            | Some s -> yield Ingredient s
+            | Some s -> Ingredient s
             | _-> failwith "Incorrect ingredient id format" ]
 
 let parse data=

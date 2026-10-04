@@ -12,15 +12,15 @@ let map data=
     |>array2D
 
 let adjacent i j=seq{
-        yield i-1,j-1; yield i-1,j; yield i-1,j+1
-        yield i,  j-1;              yield i,  j+1
-        yield i+1,j-1; yield i+1,j; yield i+1,j+1  }
+        i-1,j-1; i-1,j; i-1,j+1
+        i,  j-1;        i,  j+1
+        i+1,j-1; i+1,j; i+1,j+1  }
 
 let adjacentCells arr i j=seq {
     for x,y in adjacent i j do
         if 0<=x && x<Array2D.length1 arr &&     // why do i have to do bounds checking manually?
            0<=y && y<Array2D.length2 arr then
-            if arr[x,y]=1uy then yield 1uy }
+            if arr[x,y]=1uy then 1uy }
 
             
 let removable arr=seq {
@@ -28,7 +28,7 @@ let removable arr=seq {
         for j in 0 .. Array2D.length2 arr - 1 do
             if arr[i,j]=1uy then
                 let a=Seq.length(adjacentCells arr i j)
-                if a<4 then yield i,j }
+                if a<4 then i,j }
 
 
 let part1 data=
@@ -47,7 +47,7 @@ let part2 data=
     let mutable lastRemovable=1
     while(lastRemovable<>0) do 
         lastRemovable<-iter arr
-        yield lastRemovable
+        lastRemovable
     }|>Seq.sum
     
 let Puzzle()=

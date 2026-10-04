@@ -3,19 +3,18 @@ open FSharpPlus
 open System.Text.RegularExpressions
 open System.Numerics
 
-
 let banks data=
         Common.splitLines data
         |>Seq.map(function 
-                    s when not(Regex.IsMatch(s,@"^\d+$")) -> failwith "Incorrect battery joltage data!"
-                    |s->s)
+            | s when Regex.IsMatch(s,@"^\d+$") -> s 
+            | _ -> failwith "Incorrect battery joltage data -- non-digit character")
 
 let part1 bank=
     let maxJoltage=seq { 
             let len=String.length bank
             for i in 0..len-2 do 
                 for secondDigit in bank[i+1..len-1] do
-                    yield $"{bank[i]}{secondDigit}"
+                    $"{bank[i]}{secondDigit}"
                       } |>Seq.max
     match tryParse<int> maxJoltage with
         | Some n -> n
@@ -45,6 +44,6 @@ let part2 bank=seq {
                 }|>Seq.max
 
 let Puzzle()=
-    let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2 
+    let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2
     // let list=allCombinations |>Seq.toArray
     allCombinations |>Seq.sum
