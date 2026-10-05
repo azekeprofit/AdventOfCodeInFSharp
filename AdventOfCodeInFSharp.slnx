@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Tests/Tests.fsproj" />
+  <Project Path="AdventOfCodeInFSharp.fsproj" />
+</Solution>

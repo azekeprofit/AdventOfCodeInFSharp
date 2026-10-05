@@ -5,3 +5,5 @@
 /bin
 /.vs
 /obj
+/Tests/bin
+/Tests/obj

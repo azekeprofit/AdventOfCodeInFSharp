@@ -9,7 +9,9 @@ let banks data=
             | s when Regex.IsMatch(s,@"^\d+$") -> s 
             | _ -> failwith "Incorrect battery joltage data -- non-digit character")
 
-let part1 bank=
+let part1 lines=
+    seq{
+    for bank in banks lines do
     let maxJoltage=seq { 
             let len=String.length bank
             for i in 0..len-2 do 
@@ -18,7 +20,8 @@ let part1 bank=
                       } |>Seq.max
     match tryParse<int> maxJoltage with
         | Some n -> n
-        | _ -> failwith "This is not supposed happen"
+        | _ -> failwith "This is not supposed happen" }
+    |>Seq.sum
 
 [<TailCall>] // as of F# 10, yield!-ed tail call recursion *should* be unrolled into loop automatically
 // this attribute is here just to cause warnings if in the future function is changed and it's no longer tail-callable
@@ -37,13 +40,15 @@ let rec iteration batteries (bank:byte array) start endd remainder=seq{
 }
     
 
-let part2 bank=seq {
+let part2 lines=
+    seq{
+    for bank in banks lines do
+        seq {
         let size=12
         let bankArray=bank|>String.getBytes(System.Text.Encoding.ASCII)|>Array.map(fun b->b-48uy)
         yield! iteration 0 bankArray 0 (bank.Length-size) size
                 }|>Seq.max
+    }|>Seq.sum
 
 let Puzzle()=
-    let allCombinations=banks Day3Year2025Inputs.data |> Seq.map part2
-    // let list=allCombinations |>Seq.toArray
-    allCombinations |>Seq.sum
+    part2 Day3Year2025Inputs.data
