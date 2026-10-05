@@ -1,5 +1,9 @@
 module Day7Year2025Inputs
 
+let inputValidation="
+fpwfpf
+"
+
 let example="
 .......S.......
 ...............
