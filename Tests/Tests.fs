@@ -129,3 +129,14 @@ let ``2025 day 07 part 2`` () =
 [<Fact>]
 let ``2025 day 08 part 1 input validation`` () =
     Assert.Throws<Exception>(fun ()-> Day8Year2025.part1 Day8Year2025Inputs.inputValidation 1000:>obj)
+
+[<Fact>]
+let ``2025 day 08 part 1 example`` () =
+    Assert.Equal(Day8Year2025.part1 Day8Year2025Inputs.example 10, 40)
+
+[<Fact>]
+let ``2025 day 08 part 1`` () =
+    Assert.Equal(Day8Year2025.part1 Day8Year2025Inputs.data 1000, 41151)
+
+
+    
