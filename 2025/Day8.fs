@@ -25,7 +25,15 @@ let joinedCircuits circuits (_,(a,b))=
             if aGroup<>bGroup then
                 let min=min aGroup bGroup
                 let max=max aGroup bGroup
-                circuits|>Map.map(fun key value->if value=max then min else value)
+                let mutable counterA=0
+                let mutable counterB=0
+                let res=circuits|>Map.map(fun key value->
+                    if value=aGroup then counterA<-counterA+1
+                    if value=bGroup then counterB<-counterB+1
+                    if value=max then min else value)
+                if counterA>100 then
+                    ignore counterA
+                res
             else circuits
         | Some aGroup, None -> circuits|>Map.add b aGroup
         | None, Some bGroup -> circuits|>Map.add a bGroup
@@ -45,16 +53,16 @@ let part1 data size=
 
     let united=fold joinedCircuits Map.empty cables
             |>Map.values
-            |>Seq.groupBy(id)
+            |>Seq.groupBy id
+            |>Seq.map(snd>>Seq.length)
+            |>Seq.sortDescending
             |>Seq.toList
 
     let a=united
-        |>Seq.map(fun (id,g)-> Seq.length g)
-        |>Seq.sortDescending
         |>Seq.truncate 3
 
     a|>Seq.fold (*) 1
 
 
 let Puzzle()=
-    part1 Day8Year2025Inputs.data 1000
+    part1 Day8Year2025Inputs.example 10

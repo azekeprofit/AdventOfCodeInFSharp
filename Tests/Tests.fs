@@ -45,9 +45,13 @@ let ``2025 day 03 part 1`` () =
 let ``2025 day 03 part 2 example`` () =
     Assert.Equal(Day3Year2025.part2 Day3Year2025Inputs.example, 3121910778619I)
 
-[<Fact(Skip="takes too long")>]
+[<Fact>]
 let ``2025 day 03 part 2`` () =
     Assert.Equal(Day3Year2025.part2 Day3Year2025Inputs.data, 173577199527257I)
+
+[<Fact(Skip="takes too long")>]
+let ``2025 day 03 part 2 bad`` () =
+    Assert.Equal(Day3Year2025.part2Dumb Day3Year2025Inputs.data, 173577199527257I)
 
 [<Fact>]
 let ``2025 day 04 part 1 example`` () =

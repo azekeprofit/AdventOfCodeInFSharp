@@ -6,14 +6,15 @@ open System.Numerics
 let banks data=
         Common.splitLines data
         |>Seq.map(function 
-            | s when Regex.IsMatch(s,@"^\d+$") -> s 
+            | s when Regex.IsMatch(s,@"^\d+$") -> s|>String.getBytes System.Text.Encoding.ASCII |>Array.map(fun b->b-48uy)
             | _ -> failwith "Incorrect battery joltage data -- non-digit character")
 
-let part1 lines=
+// exhaustive dumb loop
+let part1Dumb lines=
     seq{
     for bank in banks lines do
     let maxJoltage=seq { 
-            let len=String.length bank
+            let len=bank.Length
             for i in 0..len-2 do 
                 for secondDigit in bank[i+1..len-1] do
                     $"{bank[i]}{secondDigit}"
@@ -22,6 +23,30 @@ let part1 lines=
         | Some n -> n
         | _ -> failwith "This is not supposed happen" }
     |>Seq.sum
+
+// greedy, much faster
+let part1 lines=
+    seq{
+    for bank in banks lines do
+        let len=bank.Length
+        let firstPos, firstDigit=Array.indexed bank[0..len-2]|>Array.maxBy snd
+        let secondDigit=Array.max bank[firstPos+1..]
+        int firstDigit*10+int secondDigit } |>Seq.sum
+
+let rec greedy batteries (bank:array<int*byte>) start endd remainder=
+    let newDigit=bank[start..endd]|>Array.maxBy snd
+    let num=batteries*10I+bigint(snd newDigit)
+    if remainder<2 then num else
+    greedy num bank (fst newDigit+1) (endd+1) (remainder-1)
+
+
+let part2 lines=
+    let size=12
+    seq{
+    for bank in banks lines do
+        let bankPos=Array.indexed bank
+        greedy 0 bankPos 0 (bank.Length-size) size
+    }|>Seq.sum
 
 [<TailCall>] // as of F# 10, yield!-ed tail call recursion *should* be unrolled into loop automatically
 // this attribute is here just to cause warnings if in the future function is changed and it's no longer tail-callable
@@ -40,13 +65,12 @@ let rec iteration batteries (bank:byte array) start endd remainder=seq{
 }
     
 
-let part2 lines=
+let part2Dumb lines=
     seq{
     for bank in banks lines do
         seq {
         let size=12
-        let bankArray=bank|>String.getBytes(System.Text.Encoding.ASCII)|>Array.map(fun b->b-48uy)
-        yield! iteration 0 bankArray 0 (bank.Length-size) size
+        yield! iteration 0 bank 0 (bank.Length-size) size
                 }|>Seq.max
     }|>Seq.sum
 
