@@ -42,7 +42,7 @@ let part1 data=
     ops|>Seq.mapi(fun i op -> 
         match op with
         | Addition -> sum rotated[i,0..]
-        | Multiplication-> fold (*) 1I rotated[i,0..]
+        | Multiplication -> fold (*) 1I rotated[i,0..]
     )|>Seq.sum
 
 let part2 data=

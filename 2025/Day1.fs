@@ -36,7 +36,8 @@ let turn {zeroes=z ; wheel=w} n =
                 | s -> z + turns s }
     
 let part2 data =
-    let result=fold turn {wheel=50; zeroes=0} (data|>lines|>Seq.map(function Left n -> -n ; | Right n -> n))
+    let turns=data|>lines|>Seq.map(function Left n -> -n ; | Right n -> n)
+    let result=fold turn {wheel=50; zeroes=0} turns
     result.zeroes                    
     
 
