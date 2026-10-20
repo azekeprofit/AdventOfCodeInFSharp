@@ -140,7 +140,7 @@ let ``2025 day 08 part 1 example`` () =
 
 [<Fact>]
 let ``2025 day 08 part 1`` () =
-    Assert.Equal(Day8Year2025.part1 Day8Year2025Inputs.data 1000, 41151)
+    Assert.Equal(Day8Year2025.part1 Day8Year2025Inputs.data 1000, 244188)
 
 
     
