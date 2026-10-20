@@ -4,7 +4,7 @@ open System
 open System.Text.RegularExpressions
 open System.Numerics
 
-type point=Point of int * int * int
+type point=Point of uint64 * uint64 * uint64
 let lines data=[
     let l=Common.splitLines data
     for line in l do
@@ -14,7 +14,7 @@ let lines data=[
             | _ -> failwith "Wrong points format" ]
 
 let sq x=x*x
-let distanceSq (Point(x,y,z)) (Point(a,b,c))=abs(sq(x-a)+sq(y-b)+sq(z-c))
+let distanceSq (Point(x,y,z)) (Point(a,b,c))=sq(x-a)+sq(y-b)+sq(z-c)
 // no need to calculate square root
 
 type groupId=GroupId of point
@@ -25,15 +25,8 @@ let joinedCircuits circuits (_,(a,b))=
             if aGroup<>bGroup then
                 let min=min aGroup bGroup
                 let max=max aGroup bGroup
-                let mutable counterA=0
-                let mutable counterB=0
-                let res=circuits|>Map.map(fun key value->
-                    if value=aGroup then counterA<-counterA+1
-                    if value=bGroup then counterB<-counterB+1
+                circuits|>Map.map(fun key value->
                     if value=max then min else value)
-                if counterA>100 then
-                    ignore counterA
-                res
             else circuits
         | Some aGroup, None -> circuits|>Map.add b aGroup
         | None, Some bGroup -> circuits|>Map.add a bGroup
@@ -49,20 +42,15 @@ let part1 data size=
                 then distanceSq a b, (a, b) }
             |>Seq.sortBy fst
             |>Seq.truncate size
-            |>Seq.toList
 
-    let united=fold joinedCircuits Map.empty cables
+    fold joinedCircuits Map.empty cables
             |>Map.values
             |>Seq.groupBy id
             |>Seq.map(snd>>Seq.length)
             |>Seq.sortDescending
-            |>Seq.toList
-
-    let a=united
-        |>Seq.truncate 3
-
-    a|>Seq.fold (*) 1
+            |>Seq.truncate 3
+            |>Seq.fold (*) 1
 
 
 let Puzzle()=
-    part1 Day8Year2025Inputs.example 10
+    part1 Day8Year2025Inputs.data 1000
