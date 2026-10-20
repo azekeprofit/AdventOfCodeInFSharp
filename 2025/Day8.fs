@@ -17,22 +17,22 @@ let sq x=x*x
 let distanceSq (Point(x,y,z)) (Point(a,b,c))=sq(x-a)+sq(y-b)+sq(z-c)
 // no need to calculate square root
 
-type groupId=GroupId of point
+let addToGroup (group:point ResizeArray) circuits point=
+        group.Add point
+        circuits|>Map.add point group    
 
 let joinedCircuits circuits (_,(a,b))=
     match circuits|>Map.tryFind a,circuits|>Map.tryFind b with
-        | Some aGroup, Some bGroup ->
-            if aGroup<>bGroup then
-                let min=min aGroup bGroup
-                let max=max aGroup bGroup
-                circuits|>Map.map(fun key value->
-                    if value=max then min else value)
-            else circuits
-        | Some aGroup, None -> circuits|>Map.add b aGroup
-        | None, Some bGroup -> circuits|>Map.add a bGroup
         | None, None -> 
-            let newGroupId=GroupId(min a b)
-            circuits|>Map.add a newGroupId|>Map.add b newGroupId
+            let newGroup=ResizeArray()
+            fold (addToGroup newGroup) circuits [a;b]
+        | Some aGroup, None -> 
+            addToGroup aGroup circuits  b
+        | None, Some bGroup -> 
+            addToGroup bGroup circuits a
+        | Some aGroup, Some bGroup when aGroup<>bGroup ->
+            fold (addToGroup aGroup) circuits bGroup
+        | _ -> circuits
 
 let part1 data size=
     let points=lines data
@@ -43,10 +43,11 @@ let part1 data size=
             |>Seq.sortBy fst
             |>Seq.truncate size
 
-    fold joinedCircuits Map.empty cables
+    cables
+            |>Seq.fold joinedCircuits Map.empty 
             |>Map.values
-            |>Seq.groupBy id
-            |>Seq.map(snd>>Seq.length)
+            |>Seq.distinct
+            |>Seq.map _.Count
             |>Seq.sortDescending
             |>Seq.truncate 3
             |>Seq.fold (*) 1
