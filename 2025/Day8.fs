@@ -5,6 +5,10 @@ open System.Text.RegularExpressions
 open System.Numerics
 
 type point=Point of int64 * int64 * int64
+let getX point=
+    let (Point(x,y,z))=point
+    x
+
 let lines data=[
     let l=Common.splitLines data
     for line in l do
@@ -60,10 +64,8 @@ let part2 data=
     let points=cables data
     let connected, circuits=fold joinedCircuits (Map.empty,Map.empty) points
     let lastGroup=circuits|>Map.values|>Seq.item 0
-    let lastPoint=lastGroup[lastGroup.Count-1]
-    let (Point(a,_,_))=lastPoint
-    let (Point(b,_,_))=connected[lastPoint]
-    a*b
+    let lastPoint=Seq.last lastGroup
+    getX lastPoint*getX connected[lastPoint]
 
 let Puzzle()=
     part2 Day8Year2025Inputs.data
