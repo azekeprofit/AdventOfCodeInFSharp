@@ -25,19 +25,20 @@ let addToGroup (group:point ResizeArray) circuits point=
         group.Add point
         circuits|>Map.add point group
 
-let joinedCircuits (lastConnected,circuits) (_,(a,b))=
-    let newConnected=lastConnected|>Map.add a b|>Map.add b a
+let connect connections a b=connections|>Map.add a b|>Map.add b a
+
+let joinedCircuits (connected,circuits) (_,(a,b))=
     match circuits|>Map.tryFind a,circuits|>Map.tryFind b with
         | None, None -> 
             let newGroup=ResizeArray()
-            newConnected,fold (addToGroup newGroup) circuits [a;b]
+            connect connected a b, fold (addToGroup newGroup) circuits [a;b]
         | Some aGroup, None -> 
-            newConnected, addToGroup aGroup circuits b
+            connect connected a b, addToGroup aGroup circuits b
         | None, Some bGroup -> 
-            newConnected, addToGroup bGroup circuits a
+            connect connected a b, addToGroup bGroup circuits a
         | Some aGroup, Some bGroup when aGroup<>bGroup ->
-            newConnected, fold (addToGroup aGroup) circuits bGroup
-        | _ -> lastConnected, circuits
+            connect connected a b, fold (addToGroup aGroup) circuits bGroup
+        | _ -> connected, circuits
 
 
 let cables data=
