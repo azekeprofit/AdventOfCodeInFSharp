@@ -164,5 +164,9 @@ let ``2025 day 09 part 1 example`` () =
 [<Fact>]
 let ``2025 day 09 part 1`` () =
     Assert.Equal(Day9Year2025.part1 Day9Year2025Inputs.data, 4781377701L)
+    
+[<Fact>]
+let ``2025 day 09 part 2 example`` () =
+    Assert.Equal(Day9Year2025.part2 Day9Year2025Inputs.example, 15L)
 
     
