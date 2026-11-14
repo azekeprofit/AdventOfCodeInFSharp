@@ -29,23 +29,28 @@ let normalize (coord:point->int64) (a,b) =
     let max=max (coord a) (coord b)
     min, max
 
-let isInsideBy coord rect point=
-    let min1, max1=normalize coord rect
-    let v=coord point
-    min1<=v && v<=max1
-
-let isInside rect point=
-    isInsideBy x rect point &&
-    isInsideBy y rect point
+let crosses equalAxis movingAxis equalValue moving1 moving2 rect=
+    let minx,maxx=normalize equalAxis rect
+    let miny,maxy=normalize movingAxis rect
+    let movingMin=min moving1 moving2
+    let movingMax=max moving1 moving2
+    minx<equalValue && equalValue<maxx && movingMin<maxy && miny<movingMax
 
 let part2 data=
     let points=parsePoints data|>Seq.toArray
+    let lines=points|>Seq.pairwise|>Seq.cons (points[0],Array.last points)|>Seq.toArray
 
     seq{ for a,b in Seq.allPairs points points do
-            // let inside=points|>Seq.except(seq{a; b})|>Seq.exists (isInside (a,b))|>Seq.toList
-            // let areaRes=area a b
-            if a>b && not(points|>Seq.except(seq{a; b})|>Seq.exists (isInside (a,b)))
-            then area a b }|>Seq.max
+            if a<b then
+                let wasCrossed=lines|>Array.exists(
+                    fun (c,d)->
+                                if (x c)=(x d) then
+                                    crosses x y (x c) (y c) (y d) (a,b)
+                                else 
+                                    crosses y x (y c) (x c) (x d) (a,b)
+                    )
+                if not wasCrossed then 
+                    area a b }|>Seq.max
         
 
-let Puzzle()=part2 Day9Year2025Inputs.example
+let Puzzle()=part2 Day9Year2025Inputs.data
