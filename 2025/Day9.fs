@@ -29,11 +29,17 @@ let normalize (coord:point->int64) (a,b) =
     let max=max (coord a) (coord b)
     min, max
 
-let crosses equalAxis movingAxis equalValue moving1 moving2 rect=
+let crosses rect (point1,point2)=
+    let vertical=(x point1)=(x point2)
+    let equalAxis=if vertical then x else y
+    let movingAxis=if vertical then y else x
+
     let minx,maxx=normalize equalAxis rect
     let miny,maxy=normalize movingAxis rect
-    let movingMin=min moving1 moving2
-    let movingMax=max moving1 moving2
+
+    let movingMin=min (movingAxis point1) (movingAxis point2)
+    let movingMax=max (movingAxis point1) (movingAxis point2)
+    let equalValue=equalAxis point1
     minx<equalValue && equalValue<maxx && movingMin<maxy && miny<movingMax
 
 let part2 data=
@@ -41,14 +47,8 @@ let part2 data=
     let lines=points|>Seq.pairwise|>Seq.cons (points[0],Array.last points)|>Seq.toArray
 
     seq{ for a,b in Seq.allPairs points points do
-            if a<b then
-                let wasCrossed=lines|>Array.exists(
-                    fun (c,d)->
-                                if (x c)=(x d) then
-                                    crosses x y (x c) (y c) (y d) (a,b)
-                                else 
-                                    crosses y x (y c) (x c) (x d) (a,b)
-                    )
+             if a<b then
+                let wasCrossed=lines|>Array.exists(crosses (a,b))
                 if not wasCrossed then 
                     area a b }|>Seq.max
         
