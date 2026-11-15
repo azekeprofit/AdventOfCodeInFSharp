@@ -3,8 +3,6 @@ open Common
 open FSharpPlus
 
 
-let infinity=1000
-let minInf= -1000L
 type point=Point of int64*int64
 let x (Point(x,y))=x
 let y (Point(x,y))=y
@@ -29,6 +27,18 @@ let normalize (coord:point->int64) (a,b) =
     let max=max (coord a) (coord b)
     min, max
 
+//              │point 1
+//     a        │
+//      XXXXXXXX│XXXXXXXX
+//      X       │       X
+//      XXXXXXXX│XXXXXXXX
+//              │        b
+//              │
+//              │point 2
+//
+// ─────────────────────────────────>
+// cross line doesn't move on this axis
+
 let crosses rect (point1,point2)=
     let vertical=(x point1)=(x point2)
     let equalAxis=if vertical then x else y
@@ -49,8 +59,8 @@ let part2 data=
     seq{ for a,b in Seq.allPairs points points do
              if a<b then
                 let wasCrossed=lines|>Array.exists(crosses (a,b))
-                if not wasCrossed then 
+                if not wasCrossed then
                     area a b }|>Seq.max
-        
+
 
 let Puzzle()=part2 Day9Year2025Inputs.data
