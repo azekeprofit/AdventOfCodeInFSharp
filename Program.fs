@@ -1,1 +1,1 @@
-﻿printf $"{Day9Year2025.Puzzle()}"
+﻿printf $"{Day10Year2025.Puzzle()}"

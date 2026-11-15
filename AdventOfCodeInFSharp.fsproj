@@ -17,6 +17,7 @@
     <Compile Include="inputs\2025-7.fs" />
     <Compile Include="inputs\2025-8.fs" />
     <Compile Include="inputs\2025-9.fs" />
+    <Compile Include="inputs\2025-10.fs" />
     <Compile Include="2025\Day1.fs" />
     <Compile Include="2025\Day2.fs" />
     <Compile Include="2025\Day3.fs" />
@@ -26,6 +27,7 @@
     <Compile Include="2025\Day7.fs" />
     <Compile Include="2025\Day8.fs" />
     <Compile Include="2025\Day9.fs" />
+    <Compile Include="2025\Day10.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

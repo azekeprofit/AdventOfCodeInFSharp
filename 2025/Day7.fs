@@ -35,7 +35,7 @@ let rec tree lines width=
         | _ -> failwith "Incorrect tree format"
 
 let lines data=
-    let lines=Seq.toList(Common.splitLines data)
+    let lines=Common.splitLines data|>Seq.toList
     match lines with
     | FirstLine(Some start, width) :: rest -> start, width, tree rest width
     | _ -> failwith "Incorrect input data"

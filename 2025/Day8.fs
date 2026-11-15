@@ -5,9 +5,7 @@ open System.Text.RegularExpressions
 open System.Numerics
 
 type point=Point of int64 * int64 * int64
-let getX point=
-    let (Point(x,y,z))=point
-    x
+let getX (Point(x,y,z))=x
 
 let lines data=[
     let l=Common.splitLines data
@@ -29,12 +27,12 @@ let connect connections a b=connections|>Map.add a b|>Map.add b a
 
 let joinedCircuits (connected,circuits) (_,(a,b))=
     match circuits|>Map.tryFind a,circuits|>Map.tryFind b with
-        | None, None -> 
+        | None, None ->
             let newGroup=ResizeArray()
             connect connected a b, fold (addToGroup newGroup) circuits [a;b]
-        | Some aGroup, None -> 
+        | Some aGroup, None ->
             connect connected a b, addToGroup aGroup circuits b
-        | None, Some bGroup -> 
+        | None, Some bGroup ->
             connect connected a b, addToGroup bGroup circuits a
         | Some aGroup, Some bGroup when aGroup<>bGroup ->
             connect connected a b, fold (addToGroup aGroup) circuits bGroup
