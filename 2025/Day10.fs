@@ -7,13 +7,11 @@ let wrap openBracket closeBracket inside token=
     if token[0]<>openBracket then None
     else if token[len-1]<>closeBracket then None
     else Some(inside(token.Substring(1,len-2)))
-    
-    
 
 let (|ParseIndicators|)=
-    wrap '[' ']' (Seq.map(function 
-            | '#' -> true 
-            | '.' -> false 
+    wrap '[' ']' (Seq.map(function
+            | '#' -> true
+            | '.' -> false
             | _ -> failwith "Incorrect indicator value"))
 
 let parseNumbers list=
@@ -30,22 +28,49 @@ let (|ButtonsAndJoltage|) rest=
     let len=Seq.length rest
     rest|>Seq.choosei(fun i-> if i=len-1 then Joltage else Button)
 
-let parseLines data=seq{
+let indicatorStep (sum,positional) digit=
+    (if digit then sum+positional else sum), positional*2
+
+let maxDepth=10
+
+let rec loop n acc radix=
+    if n = 0I then acc
+    else loop (n / radix) ((n % radix) :: acc) radix
+
+let rec extractDigits n acc depth radix (buttons:int array)=
+    if n=0I then acc,depth else
+        let digit=n%radix
+        let newAcc=acc^^^buttons[int digit]
+        extractDigits (n/radix) newAcc (depth+1) radix buttons
+
+let part1 data=seq{
     for line in splitLines data do
         let tokens=splitBySpaces line|>Seq.toList
         match tokens with
-        | ParseIndicators(Some state) :: ButtonsAndJoltage(buttonsAndJoltage) -> 
-            let len=Seq.length buttonsAndJoltage
+        | ParseIndicators(Some display) :: ButtonsAndJoltage(buttonsAndJoltage) ->
             let joltage,joltLen=Seq.last buttonsAndJoltage
-            if Seq.length state<>joltLen then failwith "Number of joltage values doesn't correspond to number of indicators"
-            let buttons=buttonsAndJoltage|>Seq.take(len-1)|>Seq.map fst|>Seq.toList
-            ()
-        | _ -> failwith "Wrong input data"
-        }
+            if Seq.length display<>joltLen then failwith "Number of joltage values doesn't correspond to number of indicators"
+            let target,_=display|>Seq.fold indicatorStep (0,1)
 
-let part1 data=
-    let lines=parseLines data|>Seq.toList
-    ()
+            let buttons=
+                buttonsAndJoltage
+                |>Seq.take(Seq.length(buttonsAndJoltage)-1)
+                |>Seq.map (fun (list,_)->
+                    list
+                    |>Seq.map(pown 2)
+                    |>Seq.sum)
+                |>Seq.toArray
+            let size=Array.length buttons
+
+
+            let r=seq{
+                for i in 0I..pown size maxDepth do
+                    let result,depth=extractDigits i 0 0 size buttons
+                    if result=target then depth }
+                    |>Seq.item 0
+            r
+        | _ -> failwith "Wrong input data" }|>Seq.sum
+
 
 let Puzzle()=
-    part1 Day10Year2025Inputs.inputValidation3
+    part1 Day10Year2025Inputs.data

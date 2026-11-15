@@ -184,3 +184,11 @@ let ``2025 day 10 input validation: list number doesn't correspond`` () =
 [<Fact>]
 let ``2025 day 10 input validation: empty list`` () =
     Assert.Throws<Exception>(fun ()-> Day10Year2025.part1 Day10Year2025Inputs.inputValidation3:>obj)    
+
+[<Fact>]
+let ``2025 day 10 part 1 example`` () =
+    Assert.Equal(Day10Year2025.part1 Day10Year2025Inputs.example, 7)
+
+[<Fact>]
+let ``2025 day 10 part 1`` () =
+    Assert.Equal(Day10Year2025.part1 Day10Year2025Inputs.data, 438)
