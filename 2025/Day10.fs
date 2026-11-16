@@ -48,34 +48,45 @@ let getTarget display=
         (if digit then sum+positional else sum), positional*2) (0,1)
     target
 
-let maxDepth=10
-
-let rec extractDigits n acc depth radix (buttons:int array)=
-    if n=0I then acc,depth else
-        let digit=n%radix
-        let newAcc=acc^^^buttons[int digit]
-        extractDigits (n/radix) newAcc (depth+1) radix buttons
-
-let part1 data=seq{
+let parseLines data=seq{
     for line in splitLines data do
         let tokens=splitBySpaces line|>Seq.toList
         match tokens with
         | ParseIndicators(Some display) :: ButtonsAndJoltage(buttons,(joltage,joltLen)) ->
-            if Seq.length display<>joltLen then failwith "Number of joltage values doesn't correspond to number of indicators"            
-            let size=bigint buttons.Length
-            let target=getTarget display
+            if Seq.length display<>joltLen then failwith "Number of joltage values doesn't correspond to number of indicators"
+            getTarget display,buttons,joltage
+        | _ -> failwith "Wrong input data" }
 
-            let solution=
-                seq{
-                for i in 0I..pown size maxDepth do
-                    let result,depth=extractDigits i 0 0 size buttons
-                    if result=target then depth }
-                |>Seq.tryItem 0
 
-            match solution with 
-            | Some result->result 
-            | None -> failwith $"Combination not found within maxDepth={maxDepth}"
-        | _ -> failwith "Wrong input data" }|>Seq.sum
+let maxDepth=10
+
+let rec increment (bank:ResizeArray<int>) step last=
+    if step>maxDepth then failwith "Went too deep!"
+    if bank.Count<=step then bank.Add 0
+    else 
+        let digit=bank[step]
+        bank[step]<-
+            if digit<last then digit+1 else 
+            increment bank (step+1) last
+            0
+
+
+let part1 data=
+    seq{
+    for target,buttons,_ in parseLines data do
+        let bank=ResizeArray()
+        let solution=
+            seq{
+            while true do
+                increment bank 0 (buttons.Length-1)
+                let result=bank|>Seq.fold(fun acc i->buttons[i]^^^acc) 0
+                if result=target then bank.Count }
+            |>Seq.tryItem 0
+
+        match solution with 
+        | Some result->result 
+        | None -> failwith $"Combination not found within maxDepth={maxDepth}"
+    }|>Seq.sum
 
 
 let Puzzle()=
