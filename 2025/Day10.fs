@@ -58,34 +58,33 @@ let parseLines data=seq{
         | _ -> failwith "Wrong input data" }
 
 
-let maxDepth=10
-
-let rec increment (bank:ResizeArray<int>) step last=
-    if step>maxDepth then failwith "Went too deep!"
-    if bank.Count<=step then bank.Add 0
-    else 
+let rec increment (bank:ResizeArray<int>) step last maxDepth=
+    if step>maxDepth then false else
         let digit=bank[step]
-        bank[step]<-
-            if digit<last then digit+1 else 
-            increment bank (step+1) last
-            0
+        if digit<last then 
+            bank[step]<-digit+1
+            true
+        else 
+            bank[step]<-0
+            increment bank (step+1) last maxDepth
 
 
 let part1 data=
     seq{
     for target,buttons,_ in parseLines data do
-        let bank=ResizeArray()
+        let bank=ResizeArray(Seq.replicate buttons.Length 0)
         let solution=
             seq{
-            while true do
-                increment bank 0 (buttons.Length-1)
-                let result=bank|>Seq.fold(fun acc i->buttons[i]^^^acc) 0
-                if result=target then bank.Count }
-            |>Seq.tryItem 0
-
-        match solution with 
-        | Some result->result 
-        | None -> failwith $"Combination not found within maxDepth={maxDepth}"
+            while increment bank 0 1 (buttons.Length-1) do                
+                let result,bits,_=
+                    bank
+                    |>Seq.fold(fun (acc,bits,pos) i->
+                        if i%2=1 then buttons[pos]^^^acc,bits+1,pos+1
+                        else acc,bits,pos+1)
+                        (0,0,0)
+                if result=target then bits }
+            |>Seq.min
+        solution
     }|>Seq.sum
 
 
